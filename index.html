@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link href='http://fonts.googleapis.com/css?family=Monoton|Indie+Flower|Source+Code+Pro' rel='stylesheet' type='text/css'>
+  <script src="/socket.io/socket.io.js"></script>
+
+  <style>
+    html {
+      padding: 5mm;
+      background-color: #e9e9e9;
+      font-family: 'Indie Flower', cursive;
+    }
+
+    input {
+      padding: 2mm;
+      margin: 0;
+      font-size: 1em;
+      box-sizing: border-box;
+    }
+
+    .container {
+      background-color: #fff;
+      box-shadow: 0 1px 8px rgba(0, 0, 0, 0.24);
+      margin: 0 auto;
+      max-width: 120mm;
+    }
+
+    .container > header {
+      padding: 7mm;
+      font-size: 3em;
+      font-family: 'Monoton', cursive;
+      text-align: center;
+      color: #fff;
+      background-color: #2196F3;
+    }
+
+    .container > footer {
+      padding: 2mm;
+    }
+
+    .item {
+      font-size: 1em;
+      padding: 1mm 3mm;
+    }
+
+    .item > *:not(:last-child) {
+      margin-right: 5mm;
+    }
+
+    .item .time {
+      font-size: 0.8em;
+      font-family: 'Source Code Pro', cursive ;
+    }
+    .item .user {
+      font-weight: bold;
+      color: #00BCD4;
+    }
+
+    #msgList {
+      min-height: 100mm;
+      padding: 2mm 0;
+    }
+
+    #msgList > *:nth-child(even) {
+      background: #f9f9f9;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+  <header>Messenger</header>
+  <div id="msgList"></div>
+  <footer>
+    <input id="userInput" style="width:18%" placeholder="User"/>
+    <input id="msgInput" style="width:80%" placeholder="Message" />
+  </footer>
+</div>
+
+<script>
+  var socket = io();
+
+  var msgList = document.getElementById('msgList');
+  var userInput = document.getElementById('userInput');
+  var msgInput = document.getElementById('msgInput');
+
+  function makeItem(msg) {
+    var elem = makeElem('div', ['item']);
+    elem.appendChild( makeElem('spen', ['time'], msg.time ));
+    elem.appendChild( makeElem('span', ['user'], msg.user) );
+    elem.appendChild( makeElem('span', ['content'], msg.content) );
+    return elem;
+  }
+
+  function makeElem(tag, classes, content){
+    var elem = document.createElement(tag);
+    classes = classes || [];
+    for(var i=0; i<classes.length; i++){
+      elem.classList.add(classes[i]);
+    }
+    elem.textContent = content || '';
+    return elem;
+  }
+
+  function now(){
+    var pad = function(n){
+      return n < 10 ? '0'+n : n;
+    };
+    var d = new Date();
+    return [d.getHours(), d.getMinutes(), d.getSeconds()].map(pad).join(':');
+  }
+
+  // enter to append task
+  msgInput.onkeydown = function(event) {
+    if (event.keyCode === 13) {
+      var user = userInput.value || 'anonymous';
+      var msg = msgInput.value;
+      if( msg === null || msg === '') return;
+      msgInput.value = '';
+      socket.emit('msg', {
+        time: now(),
+        user: user,
+        content: msg
+      })
+    }
+  };
+
+  socket.on('msg', function(msg){
+    msgList.appendChild(makeItem(msg))
+  });
+
+</script>
+</body>
+
+</html>
