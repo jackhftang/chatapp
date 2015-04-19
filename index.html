@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <link href='http://fonts.googleapis.com/css?family=Monoton|Indie+Flower|Source+Code+Pro' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Roboto|Indie+Flower|Source+Code+Pro' rel='stylesheet' type='text/css'>
   <script src="/socket.io/socket.io.js"></script>
 
   <style>
@@ -28,11 +28,11 @@
 
     .container > header {
       padding: 7mm;
-      font-size: 3em;
-      font-family: 'Monoton', cursive;
-      text-align: center;
+      font-size: 2em;
+      font-family: 'Roboto', sans-serif;
+      text-align: left;
       color: #fff;
-      background-color: #2196F3;
+      background-color: #004D40;
     }
 
     .container > footer {
@@ -72,7 +72,7 @@
 <body>
 
 <div class="container">
-  <header>Messenger</header>
+  <header>My Messenger</header>
   <div id="msgList"></div>
   <footer>
     <input id="userInput" style="width:18%" placeholder="User"/>
@@ -128,8 +128,12 @@
     }
   };
 
-  socket.on('msg', function(msg){
-    msgList.appendChild(makeItem(msg))
+  // socket event handler
+  socket.on('msg', function(msgs){
+    if( ! Array.isArray(msgs) ) msgs = [msgs];
+    for(var i=0; i<msgs.length; i++){
+      msgList.appendChild(makeItem(msgs[i]))
+    }
   });
 
 </script>
